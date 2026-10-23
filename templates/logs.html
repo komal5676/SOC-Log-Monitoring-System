@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Event Logs | SOC Monitor</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 230px;
+            height: 100vh;
+            background: #111827;
+            border-right: 1px solid #263244;
+            padding: 25px 15px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #38bdf8;
+            padding: 0 12px 30px;
+        }
+
+        .logo span {
+            color: #f8fafc;
+        }
+
+        .nav-title {
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 15px 12px 8px;
+            letter-spacing: 1px;
+        }
+
+        .nav a {
+            display: block;
+            padding: 12px;
+            margin: 5px 0;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #1e293b;
+            color: #38bdf8;
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 230px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .status {
+            background: #111827;
+            border: 1px solid #263244;
+            padding: 9px 14px;
+            border-radius: 20px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* PANEL */
+
+        .panel {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #263244;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .count {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            text-align: left;
+            padding: 13px;
+
+            color: #64748b;
+
+            font-size: 11px;
+            text-transform: uppercase;
+
+            border-bottom: 1px solid #263244;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px;
+
+            border-bottom: 1px solid #1e293b;
+
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background: #172033;
+        }
+
+        /* SPECIAL COLUMNS */
+
+        .record {
+            color: #22d3ee;
+            font-family: monospace;
+        }
+
+        .event-id {
+            color: #a78bfa;
+            font-family: monospace;
+        }
+
+        .logon-id {
+            color: #34d399;
+            font-family: monospace;
+        }
+
+        .mitre {
+            color: #c084fc;
+            font-family: monospace;
+        }
+
+        .unknown {
+            color: #64748b;
+        }
+
+        /* SEVERITY */
+
+        .severity {
+            display: inline-block;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+        .critical {
+            background: #450a0a;
+            color: #f87171;
+        }
+
+        .high {
+            background: #431407;
+            color: #fb923c;
+        }
+
+        .medium {
+            background: #451a03;
+            color: #fbbf24;
+        }
+
+        .low {
+            background: #082f49;
+            color: #38bdf8;
+        }
+
+        .info {
+            background: #1e293b;
+            color: #94a3b8;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            padding: 40px;
+
+            text-align: center;
+
+            color: #64748b;
+        }
+
+        .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:15px 20px; border-bottom:1px solid #263244; }
+        .toolbar input, .toolbar select { background:#0f172a; color:#e5e7eb; border:1px solid #334155; border-radius:6px; padding:9px 10px; }
+        .toolbar button, .pager a, .pager span { border:1px solid #334155; background:#172033; color:#e5e7eb; padding:8px 12px; border-radius:6px; text-decoration:none; font-size:13px; }
+        .toolbar button { background:#0284c7; border-color:#0284c7; cursor:pointer; }
+        .pager { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:15px 20px; }
+        .pager .disabled { opacity:.4; pointer-events:none; }
+        .pager .current { color:#38bdf8; font-weight:bold; }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 65px;
+            }
+
+            .logo span,
+            .nav-title {
+                display: none;
+            }
+
+            .main {
+                margin-left: 65px;
+                padding: 15px;
+            }
+
+        }
+    .event-link
+    {
+       color: #22d3ee;
+       text-decoration: none;
+       font-family: monospace;
+       cursor: pointer;
+  }
+
+    .event-link:hover 
+    {
+      color: #38bdf8;
+      text-decoration: underline;
+    }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        🛡️ <span>SOC Monitor</span>
+
+    </div>
+
+
+    <div class="nav-title">
+
+        Monitoring
+
+    </div>
+
+
+    <div class="nav">
+
+        <a href="{{ url_for('soc_dashboard') }}">
+
+            📊 Dashboard
+
+        </a>
+
+
+        <a href="{{ url_for('logs') }}"
+           class="active">
+
+            📋 Event Logs
+
+        </a>
+
+
+        <a href="{{ url_for('alerts') }}">
+
+            🚨 Alerts
+
+        </a>
+
+
+        <a href="{{ url_for('search') }}">
+
+            🔎 Search
+
+        </a>
+
+
+        <a href="{{ url_for('report') }}">
+
+            📈 Reports
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <div>
+
+            <h1>
+                Event Logs
+            </h1>
+
+            <div class="subtitle">
+
+                Windows Security Events
+                collected by the SOC
+
+            </div>
+
+        </div>
+
+
+        <div class="status">
+
+            <span class="dot"></span>
+
+            Monitoring Active
+
+        </div>
+
+    </div>
+
+
+
+    <!-- EVENT PANEL -->
+
+    <div class="panel">
+
+
+        <div class="panel-header">
+
+            <h2>
+                Security Event Records
+            </h2>
+
+            <div class="count">
+
+                {{ total_events }} total events · page {{ page }} of {{ total_pages }}
+
+            </div>
+
+        </div>
+
+        <form class="toolbar" method="get" action="{{ url_for('logs') }}">
+            <label for="host-filter">Host</label>
+            <select id="host-filter" name="host">
+                <option value="">All hosts</option>
+                {% for host in hosts %}
+                <option value="{{ host }}" {% if hostname_filter == host %}selected{% endif %}>{{ host }}</option>
+                {% endfor %}
+            </select>
+            <label for="page-size">Rows per page</label>
+            <select id="page-size" name="page_size">
+                {% for size in [25, 50, 100] %}
+                <option value="{{ size }}" {% if page_size == size %}selected{% endif %}>{{ size }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Apply</button>
+        </form>
+
+        {% if events %}
+
+
+        <div class="table-wrapper">
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Record ID
+                        </th>
+
+                        <th>
+                            Event ID
+                        </th>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Host
+                        </th>
+
+                        <th>
+                            User
+                        </th>
+
+                        <th>
+                            Logon ID
+                        </th>
+
+                        <th>
+                            Event
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Severity
+                        </th>
+
+                        <th>
+                            MITRE
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+
+                <tbody>
+
+
+                    {% for event in events %}
+
+
+                    <tr>
+
+
+                        <!-- RECORD ID -->
+
+                       <td class="record">
+    {% if event.record_id is not none %}
+        <a class="event-link"
+           href="{{ url_for('event_details', record_id=event.record_id, host=event.hostname) }}">
+            {{ event.record_id }}
+        </a>
+    {% else %}
+        N/A
+    {% endif %}
+</td>
+
+
+
+                        <!-- EVENT ID -->
+
+                        <td class="event-id">
+
+                            {{ event.event_id }}
+
+                        </td>
+
+
+
+                        <!-- TIME -->
+
+                        <td>
+
+                            {{ event.time }}
+
+                        </td>
+
+
+
+                        <!-- HOST -->
+
+                        <td>
+
+                            {{ event.hostname }}
+
+                        </td>
+
+
+
+                        <!-- USER -->
+
+                        <td>
+
+                            {% if event.user
+                                  and event.user != "Unknown" %}
+
+                                {{ event.user }}
+
+                            {% else %}
+
+                                <span class="unknown">
+
+                                    Unknown
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+
+                        <!-- LOGON ID -->
+
+                        <td class="logon-id">
+
+                            {% if event.logon_id
+                                  and event.logon_id != "Unknown" %}
+
+                                {{ event.logon_id }}
+
+                            {% else %}
+
+                                <span class="unknown">
+
+                                    N/A
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+
+                        <!-- EVENT NAME -->
+
+                        <td>
+
+                            {{ event.name }}
+
+                        </td>
+
+
+
+                        <!-- CATEGORY -->
+
+                        <td>
+
+                            {{ event.category }}
+
+                        </td>
+
+
+
+                        <!-- SEVERITY -->
+
+                        <td>
+
+
+                            {% if event.severity == "Critical" %}
+
+                                <span class="severity critical">
+                                    Critical
+                                </span>
+
+
+                            {% elif event.severity == "High" %}
+
+                                <span class="severity high">
+                                    High
+                                </span>
+
+
+                            {% elif event.severity == "Medium" %}
+
+                                <span class="severity medium">
+                                    Medium
+                                </span>
+
+
+                            {% elif event.severity == "Low" %}
+
+                                <span class="severity low">
+                                    Low
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="severity info">
+                                    Info
+                                </span>
+
+                            {% endif %}
+
+
+                        </td>
+
+
+
+                        <!-- MITRE -->
+
+                        <td class="mitre">
+
+                            {% if event.mitre_id %}
+
+                                {{ event.mitre_id }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="empty">
+
+            No security events available.
+
+        </div>
+
+
+        {% endif %}
+
+
+        <div class="pager">
+            <span>Showing {{ ((page - 1) * page_size) + (1 if total_events else 0) }}–{{ ((page - 1) * page_size) + events|length }} of {{ total_events }}</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                {% if page > 1 %}
+                <a href="{{ url_for('logs', page=page-1, page_size=page_size, host=hostname_filter) }}">← Previous</a>
+                {% else %}<span class="disabled">← Previous</span>{% endif %}
+                <span class="current">{{ page }} / {{ total_pages }}</span>
+                {% if page < total_pages %}
+                <a href="{{ url_for('logs', page=page+1, page_size=page_size, host=hostname_filter) }}">Next →</a>
+                {% else %}<span class="disabled">Next →</span>{% endif %}
+            </div>
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

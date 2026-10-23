@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Incident Details</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 30px;
+            background: #0B0F14;
+            color: #D7DEE7;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        a {
+            color: #4CC9F0;
+            text-decoration: none;
+        }
+
+        .card {
+            background: #121821;
+            border: 1px solid #232B36;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .critical {
+            color: #FF4365;
+        }
+
+        .high {
+            color: #FF9F1C;
+        }
+
+        .medium {
+            color: #FFD23F;
+        }
+
+        .low {
+            color: #4FD1A5;
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .label {
+            color: #7C8998;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #232B36;
+            text-align: left;
+        }
+
+        th {
+            color: #7C8998;
+        }
+
+        .mitre {
+            display: inline-block;
+            padding: 6px 10px;
+            margin: 5px;
+            border: 1px solid #4CC9F0;
+            border-radius: 5px;
+            color: #4CC9F0;
+        }
+        .logon-group {
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid #263449;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.logon-group h3 {
+    margin-top: 0;
+    color: #4CC9F0;
+    font-size: 16px;
+}
+
+.logon-group table {
+    min-width: 600px;
+}
+
+        .card ul {
+            padding-left: 22px;
+            line-height: 1.8;
+        }
+
+        .card li {
+            margin-bottom: 6px;
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CC9F0;
+        }
+
+        .mitre {
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 14px;
+            }
+
+            .header {
+                align-items: flex-start;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                padding: 14px;
+                overflow-x: auto;
+            }
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <div class="header">
+
+        <h1>
+            🛡 Incident Investigation
+        </h1>
+
+        <a href="/soc">
+            ← Back to SOC
+        </a>
+
+    </div>
+
+
+    <!-- INCIDENT -->
+
+    <div class="card">
+
+        <div class="label">
+            Incident
+        </div>
+
+        <h2>
+            {{ incident.name }}
+        </h2>
+
+        <p>
+            {{ incident.description }}
+        </p>
+
+    </div>
+
+
+   
+    <!-- RISK -->
+    <div class="card">
+        <div class="label">Risk Assessment</div>
+
+        <p>
+            Risk Score:
+            <span class="score">{{ incident.risk_score }}/100</span>
+        </p>
+
+        <p>
+            Risk Level:
+            <strong class="{{ incident.risk_level|lower }}">
+                {{ incident.risk_level }}
+            </strong>
+        </p>
+
+        <p>
+            Host:
+            <strong>{{ incident.hostname or "Unknown" }}</strong>
+        </p>
+
+        <p>
+            User:
+            <strong>{{ incident.user or incident.username or "Unknown" }}</strong>
+        </p>
+
+        <p>
+            Events Associated:
+            <strong>{{ incident.event_count or incident.events|length }}</strong>
+        </p>
+
+        <p>
+            Start Time:
+            <strong>{{ incident.start_time or "Not available" }}</strong>
+        </p>
+
+        <p>
+            End Time:
+            <strong>{{ incident.end_time or "Not available" }}</strong>
+        </p>
+    </div>
+
+    <!-- WHY THIS INCIDENT WAS FLAGGED -->
+    <div class="card">
+        <div class="label">Why This Incident Was Raised</div>
+
+        {% if incident.risk_reasons %}
+            <ul>
+                {% for reason in incident.risk_reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No risk explanation was provided by the risk engine.</p>
+        {% endif %}
+    </div>
+
+    <!-- RECOMMENDED RESPONSE -->
+    <div class="card">
+        <div class="label">Recommended Investigation Actions</div>
+
+        {% set level = incident.risk_level|lower %}
+
+        {% if level == "critical" %}
+            <ul>
+                <li>Prioritize investigation and verify the affected account and endpoint.</li>
+                <li>Review related authentication and privilege-change events.</li>
+                <li>If compromise is confirmed, follow your incident-response procedure to contain the endpoint or account.</li>
+                <li>Preserve relevant logs and document the investigation.</li>
+            </ul>
+        {% elif level == "high" %}
+            <ul>
+                <li>Review the event timeline and confirm whether the activity was authorized.</li>
+                <li>Check for repeated login failures, successful logins, and unusual account activity.</li>
+                <li>Escalate if evidence indicates account compromise.</li>
+            </ul>
+        {% elif level == "medium" %}
+            <ul>
+                <li>Review associated events and validate the activity with the system owner.</li>
+                <li>Check for related authentication or privilege events.</li>
+                <li>Escalate if suspicious behavior is confirmed.</li>
+            </ul>
+        {% else %}
+            <ul>
+                <li>Review the associated events and confirm whether the activity is expected.</li>
+                <li>Record relevant findings and continue monitoring for related activity.</li>
+            </ul>
+        {% endif %}
+    </div>
+
+   
+    <!-- TIMELINE -->
+
+    <div class="card">
+
+        <div class="label">
+            Event Timeline
+        </div>
+
+        {% if incident.events_by_logon %}
+
+            {% for logon_id, logon_events in incident.events_by_logon.items() %}
+
+                <div class="logon-group">
+
+                    <h3>
+                        Logon ID: {{ logon_id }}
+                    </h3>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event ID</th>
+                                <th>Event</th>
+                                <th>Severity</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for event in logon_events %}
+                                <tr>
+                                    <td>{{ event.event_id }}</td>
+                                    <td>{{ event.name }}</td>
+                                    <td>{{ event.severity }}</td>
+                                    <td>{{ event.time }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No grouped event data available.</p>
+
+        {% endif %}
+
+    </div>
+
+
+
+   
+    <!-- MITRE ATT&CK -->
+    <div class="card">
+        <div class="label">MITRE ATT&CK</div>
+
+        {% if incident.mitre_techniques %}
+            {% for technique in incident.mitre_techniques %}
+                <div class="mitre">
+                    <strong>{{ technique.id }}</strong>
+                    {% if technique.name %}
+                        — {{ technique.name }}
+                    {% elif technique.description %}
+                        — {{ technique.description }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No MITRE ATT&CK technique mapped.</p>
+        {% endif %}
+    </div>
+
+
+</div>
+
+</body>
+
+</html>

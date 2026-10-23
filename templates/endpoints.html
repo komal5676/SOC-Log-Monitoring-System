@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="15">
+    <title>Endpoints | SentinelX</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 28px;
+            background: #0b1120;
+            color: #e5e7eb;
+            font-family: Arial, sans-serif;
+        }
+        main {
+            max-width: 1100px;
+            margin: auto;
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        header { padding: 24px; border-bottom: 1px solid #263244; }
+        h1 { margin: 0; color: #38bdf8; }
+        .sub, .note { color: #94a3b8; }
+        nav { padding: 16px 24px; }
+        nav a { color: #38bdf8; text-decoration: none; margin-right: 18px; }
+        nav a:hover { text-decoration: underline; }
+        .table-wrap { overflow-x: auto; padding: 0 24px 24px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid #263244; }
+        th { color: #94a3b8; }
+        .status { font-weight: bold; }
+        .online { color: #22c55e; }
+        .offline { color: #f87171; }
+        .unknown { color: #fbbf24; }
+        .note { font-size: 13px; padding: 0 24px 24px; line-height: 1.5; }
+        @media (max-width: 600px) { body { padding: 12px; } }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <h1>Endpoint Monitoring</h1>
+        <p class="sub">SentinelX — Endpoint Heartbeat and Event Inventory</p>
+    </header>
+    <nav>
+        <a href="{{ url_for('soc_dashboard') }}">← SOC Dashboard</a>
+        <a href="{{ url_for('logs') }}">Event Logs</a>
+    </nav>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Hostname</th>
+                    <th>Status</th>
+                    <th>Last Heartbeat (UTC)</th>
+                    <th>Stored Events</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for endpoint in endpoints %}
+                <tr>
+                    <td>{{ endpoint.hostname }}</td>
+                    <td>
+                        <span class="status {% if endpoint.status == 'Online' %}online{% elif endpoint.status == 'Offline' %}offline{% else %}unknown{% endif %}">
+                            {{ endpoint.status }}
+                        </span>
+                    </td>
+                    <td>{{ endpoint.last_seen or 'Never received' }}</td>
+                    <td>{{ endpoint.event_count }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No endpoints registered yet. Start an agent to register one.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="note">
+        This page refreshes every 15 seconds. Online means a valid heartbeat was received within the last 90 seconds.
+        Hosts with stored events but no heartbeat show No heartbeat.
+    </div>
+</main>
+</body>
+</html>

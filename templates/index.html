@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>System Logs</title>
+</head>
+
+<body>
+
+<h1>SOC Log Monitoring System</h1>
+<hr>
+
+<h2>Dashboard</h2>
+
+<p><b>Total Logs :</b> {{ total }}</p>
+
+<p><b>Successful Login :</b> {{ success }}</p>
+
+<p><b>Failed Login :</b> {{ failed }}</p>
+
+<h3>{{ alert }}</h3>
+
+<a href="/logs">View All Logs</a>
+<br><br>
+
+<a href="/alerts">View Alerts</a>
+<br><br>
+<a href="/search">Search Logs</a>
+<br><br>
+<a href="/report">Incident Report</a>
+
+<hr>
+
+<h2>Recent Windows Security Events</h2>
+
+<table border="1" cellpadding="8">
+
+    <tr>
+        <th>Icon</th>
+        <th>Event ID</th>
+        <th>Event</th>
+        <th>Severity</th>
+        <th>Source</th>
+        <th>Time</th>
+    </tr>
+
+    {% for event in events %}
+
+    <tr>
+
+        <td>{{ event.icon }}</td>
+
+        <td>{{ event.event_id }}</td>
+
+        <td>{{ event.name }}</td>
+
+        <td>{{ event.severity }}</td>
+
+        <td>{{ event.source }}</td>
+
+        <td>{{ event.time }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+
+</body>
+</html>

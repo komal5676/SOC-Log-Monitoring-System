@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Event Details | SentinelX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin: 0;
+        }
+
+        .panel {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid #263244;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .value {
+            font-size: 15px;
+            color: #f8fafc;
+        }
+
+        .description {
+            margin-top: 20px;
+            padding: 16px;
+            background: #0f172a;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 6px;
+            background: #0284c7;
+            color: white;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background: #0369a1;
+        }
+
+        .severity {
+            font-weight: bold;
+        }
+
+        .critical { color: #f87171; }
+        .high { color: #fb923c; }
+        .medium { color: #fbbf24; }
+        .low { color: #38bdf8; }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 15px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>Security Event Details</h1>
+            <p style="color:#94a3b8;">
+                SentinelX SOC Monitoring System
+            </p>
+        </div>
+
+        <a class="button"
+           href="{{ url_for('soc_dashboard', host=event.hostname) }}">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="panel">
+        <div class="details">
+
+            <div class="field">
+                <div class="label">Record ID</div>
+                <div class="value">{{ event.record_id }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Event ID</div>
+                <div class="value">{{ event.event_id }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Event Name</div>
+                <div class="value">{{ event.name }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Timestamp</div>
+                <div class="value">{{ event.time }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Hostname</div>
+                <div class="value">{{ event.hostname }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Username</div>
+                <div class="value">{{ event.user }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Category</div>
+                <div class="value">{{ event.category }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Severity</div>
+                <div class="value severity {{ event.severity|lower }}">
+                    {{ event.severity }}
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="label">Risk Score</div>
+                <div class="value">{{ event.risk_score }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">Logon ID</div>
+                <div class="value">{{ event.logon_id }}</div>
+            </div>
+
+            <div class="field">
+                <div class="label">MITRE ATT&CK ID</div>
+                <div class="value">{{ event.mitre_id or 'Not available' }}</div>
+            </div>
+
+        </div>
+
+        <div class="description">
+            <div class="label">Event Description</div>
+            <div class="value">
+                {{ event.description or event.name or 'No description available.' }}
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

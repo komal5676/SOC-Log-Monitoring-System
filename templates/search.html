@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SentinelX | Event Search</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #0b1120;
+            color: #e5e7eb;
+            font-family: Arial, sans-serif;
+        }
+        .main { max-width: 1400px; margin: auto; padding: 28px; }
+        h1 { margin-bottom: 8px; }
+        .subtitle, .muted { color: #94a3b8; }
+        .panel {
+            background: #111827;
+            border: 1px solid #263449;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        input, select, button, .reset {
+            min-height: 40px;
+            padding: 9px 12px;
+            border: 1px solid #37465d;
+            border-radius: 6px;
+            background: #0b1220;
+            color: #e5e7eb;
+            font-size: 14px;
+        }
+        input { max-width: 100%; }
+        input[type="search"], input[name="username"] { flex: 1 1 200px; }
+        input[type="datetime-local"] { display: block; width: 100%; }
+        label { color: #94a3b8; font-size: 13px; }
+        button {
+            background: #2563eb;
+            border-color: #2563eb;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        a { color: #60a5fa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .reset { display: inline-flex; align-items: center; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        h2 { font-size: 18px; margin: 0; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #263449;
+            vertical-align: top;
+        }
+        th { color: #94a3b8; background: #172033; }
+        tr:hover td { background: #172033; }
+        .empty { padding: 25px 5px; color: #94a3b8; }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            background: #263449;
+        }
+        .pager {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .pager-links { display: flex; gap: 14px; }
+        @media (max-width: 700px) {
+            .main { padding: 14px; }
+            .toolbar > * { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<main class="main">
+    <h1>Search Security Events</h1>
+    <div class="subtitle">
+        Search stored security events using keywords and filters.
+    </div>
+
+    <div class="panel">
+        <form class="toolbar" method="get" action="{{ url_for('search') }}">
+            <input type="search" name="keyword"
+                   value="{{ keyword }}"
+                   placeholder="Search events, host, user, description, MITRE...">
+
+            <select name="host">
+                <option value="">All hosts</option>
+                {% for host in hosts %}
+                <option value="{{ host }}"
+                    {% if hostname_filter == host %}selected{% endif %}>
+                    {{ host }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="event_id" min="0"
+                   value="{{ event_id_filter }}" placeholder="Event ID">
+
+            <select name="severity">
+                <option value="">All severities</option>
+                {% for level in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+                <option value="{{ level }}"
+                    {% if severity_filter == level %}selected{% endif %}>
+                    {{ level }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <input type="text" name="username"
+                   value="{{ username_filter }}" placeholder="Username">
+
+            <label>From
+                <input type="datetime-local" name="start_time"
+                       value="{{ start_time_filter }}">
+            </label>
+
+            <label>To
+                <input type="datetime-local" name="end_time"
+                       value="{{ end_time_filter }}">
+            </label>
+
+            <select name="page_size">
+                {% for size in [25, 50, 100] %}
+                <option value="{{ size }}"
+                    {% if page_size == size %}selected{% endif %}>
+                    {{ size }} per page
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Search</button>
+            <a class="reset" href="{{ url_for('search') }}">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Search Results</h2>
+            <span class="muted">{{ total_results }} matching events</span>
+        </div>
+
+        {% if has_filters and results %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event ID</th>
+                        <th>Time</th>
+                        <th>Hostname</th>
+                        <th>Username</th>
+                        <th>Severity</th>
+                        <th>Event</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in results %}
+                    <tr>
+                        <td>{{ event.get('event_id', '') }}</td>
+                        <td>{{ event.get('time', '') }}</td>
+                        <td>{{ event.get('hostname', '') }}</td>
+                        <td>{{ event.get('user', '') }}</td>
+                        <td><span class="badge">{{ event.get('severity', '') }}</span></td>
+                        <td>{{ event.get('name', '') }}</td>
+                        <td>{{ event.get('description', '') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% elif has_filters %}
+        <div class="empty">
+            No matching events found. Try changing your filters.
+        </div>
+        {% else %}
+        <div class="empty">
+            Enter a keyword or select one or more filters to search events.
+        </div>
+        {% endif %}
+
+        {% if has_filters and total_results > 0 %}
+        <div class="pager">
+            <span class="muted">
+                Page {{ page }} of {{ total_pages }}
+            </span>
+            <div class="pager-links">
+                {% if page > 1 %}
+                <a href="{{ url_for('search', keyword=keyword, host=hostname_filter, event_id=event_id_filter, severity=severity_filter, username=username_filter, start_time=start_time_filter, end_time=end_time_filter, page=page-1, page_size=page_size) }}">Previous</a>
+                {% endif %}
+                {% if page < total_pages %}
+                <a href="{{ url_for('search', keyword=keyword, host=hostname_filter, event_id=event_id_filter, severity=severity_filter, username=username_filter, start_time=start_time_filter, end_time=end_time_filter, page=page+1, page_size=page_size) }}">Next</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+</body>
+</html>

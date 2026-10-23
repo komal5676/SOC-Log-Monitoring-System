@@ -1,0 +1,16 @@
+
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+instance/
+*.db
+agent_queue
+soc.log
+logs.txt
+sentinelx_incident_report.csv
+app_before_*.py
+search_before_*.html
+modules/database_before_advanced_search.py
+original_files.txt

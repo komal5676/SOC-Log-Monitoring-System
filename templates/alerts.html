@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+
+
+    <meta charset="UTF-8">
+
+
+
+    <meta name="viewport"
+
+          content="width=device-width, initial-scale=1.0">
+
+
+
+    <title>Alerts | SOC Monitor</title>
+
+
+
+    <style>
+
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #0b1120;
+
+            color: #e5e7eb;
+
+        }
+
+
+
+        /* SIDEBAR */
+
+
+
+        .sidebar {
+
+            position: fixed;
+
+            left: 0;
+
+            top: 0;
+
+
+
+            width: 230px;
+
+            height: 100vh;
+
+
+
+            background: #111827;
+
+
+
+            border-right: 1px solid #263244;
+
+
+
+            padding: 25px 15px;
+
+        }
+
+
+
+        .logo {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+
+
+            color: #38bdf8;
+
+
+
+            padding: 0 12px 30px;
+
+        }
+
+
+
+        .logo span {
+
+            color: #f8fafc;
+
+        }
+
+
+
+        .nav-title {
+
+            color: #64748b;
+
+
+
+            font-size: 11px;
+
+
+
+            text-transform: uppercase;
+
+
+
+            margin: 15px 12px 8px;
+
+
+
+            letter-spacing: 1px;
+
+        }
+
+
+
+        .nav a {
+
+            display: block;
+
+
+
+            padding: 12px;
+
+
+
+            margin: 5px 0;
+
+
+
+            color: #94a3b8;
+
+
+
+            text-decoration: none;
+
+
+
+            border-radius: 7px;
+
+
+
+            font-size: 14px;
+
+        }
+
+
+
+        .nav a:hover,
+
+        .nav a.active {
+
+
+
+            background: #1e293b;
+
+
+
+            color: #38bdf8;
+
+        }
+
+
+
+        /* MAIN */
+
+
+
+        .main {
+
+            margin-left: 230px;
+
+
+
+            padding: 30px;
+
+        }
+
+
+
+        .topbar {
+
+
+
+            display: flex;
+
+
+
+            justify-content: space-between;
+
+
+
+            align-items: center;
+
+
+
+            margin-bottom: 25px;
+
+        }
+
+
+
+        h1 {
+
+            margin: 0;
+
+
+
+            font-size: 25px;
+
+        }
+
+
+
+        .subtitle {
+
+
+
+            color: #64748b;
+
+
+
+            font-size: 13px;
+
+
+
+            margin-top: 6px;
+
+        }
+
+
+
+        .status {
+
+
+
+            background: #111827;
+
+
+
+            border: 1px solid #263244;
+
+
+
+            padding: 9px 14px;
+
+
+
+            border-radius: 20px;
+
+
+
+            color: #94a3b8;
+
+
+
+            font-size: 13px;
+
+        }
+
+
+
+        .dot {
+
+
+
+            display: inline-block;
+
+
+
+            width: 8px;
+
+
+
+            height: 8px;
+
+
+
+            background: #22c55e;
+
+
+
+            border-radius: 50%;
+
+
+
+            margin-right: 6px;
+
+        }
+
+
+
+        /* SUMMARY */
+
+
+
+        .cards {
+
+
+
+            display: grid;
+
+
+
+            grid-template-columns:
+
+                repeat(3, 1fr);
+
+
+
+            gap: 15px;
+
+
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .card {
+
+
+
+            background: #111827;
+
+
+
+            border: 1px solid #263244;
+
+
+
+            border-radius: 10px;
+
+
+
+            padding: 18px;
+
+        }
+
+
+
+        .card-title {
+
+
+
+            color: #64748b;
+
+
+
+            font-size: 11px;
+
+
+
+            text-transform: uppercase;
+
+
+
+            letter-spacing: .6px;
+
+        }
+
+
+
+        .card-value {
+
+
+
+            font-size: 28px;
+
+
+
+            font-weight: bold;
+
+
+
+            margin-top: 8px;
+
+        }
+
+
+
+        .red {
+
+            color: #ef4444;
+
+        }
+
+
+
+        .orange {
+
+            color: #f97316;
+
+        }
+
+
+
+        .blue {
+
+            color: #38bdf8;
+
+        }
+
+
+
+        /* PANEL */
+
+
+
+        .panel {
+
+
+
+            background: #111827;
+
+
+
+            border: 1px solid #263244;
+
+
+
+            border-radius: 10px;
+
+
+
+            overflow: hidden;
+
+        }
+
+
+
+        .panel-header {
+
+
+
+            padding: 16px 20px;
+
+
+
+            border-bottom: 1px solid #263244;
+
+
+
+            display: flex;
+
+
+
+            justify-content: space-between;
+
+
+
+            align-items: center;
+
+        }
+
+
+
+        .panel-header h2 {
+
+
+
+            margin: 0;
+
+
+
+            font-size: 16px;
+
+        }
+
+
+
+        .count {
+
+
+
+            color: #64748b;
+
+
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ALERT */
+
+
+
+        .alert {
+
+
+
+            margin: 15px;
+
+
+
+            padding: 18px;
+
+
+
+            border: 1px solid #334155;
+
+
+
+            border-radius: 8px;
+
+
+
+            background: #0f172a;
+
+        }
+
+
+
+        .alert:hover {
+
+            background: #172033;
+
+        }
+
+
+
+        /* CLICKABLE ALERT CARDS */
+
+        .alert-link {
+
+            display: block;
+
+            color: inherit;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .alert-link:hover {
+
+            border-color: #38bdf8;
+
+            background: #172033;
+
+            color: inherit;
+
+        }
+
+
+
+        .alert-title {
+
+
+
+            display: flex;
+
+
+
+            justify-content: space-between;
+
+
+
+            align-items: center;
+
+
+
+            gap: 10px;
+
+        }
+
+
+
+        .alert-name {
+
+
+
+            font-size: 16px;
+
+
+
+            font-weight: bold;
+
+        }
+
+
+
+        .severity {
+
+
+
+            display: inline-block;
+
+
+
+            padding: 4px 9px;
+
+
+
+            border-radius: 4px;
+
+
+
+            font-size: 11px;
+
+
+
+            font-weight: bold;
+
+        }
+
+
+
+        .critical {
+
+
+
+            background: #450a0a;
+
+
+
+            color: #f87171;
+
+        }
+
+
+
+        .high {
+
+
+
+            background: #431407;
+
+
+
+            color: #fb923c;
+
+        }
+
+
+
+        .medium {
+
+
+
+            background: #451a03;
+
+
+
+            color: #fbbf24;
+
+        }
+
+
+
+        .low {
+
+
+
+            background: #082f49;
+
+
+
+            color: #38bdf8;
+
+        }
+
+
+
+        .alert-meta {
+
+
+
+            color: #94a3b8;
+
+
+
+            font-size: 12px;
+
+
+
+            margin-top: 9px;
+
+        }
+
+
+
+        .description {
+
+
+
+            color: #cbd5e1;
+
+
+
+            font-size: 13px;
+
+
+
+            margin-top: 10px;
+
+
+
+            line-height: 1.5;
+
+        }
+
+
+
+        .empty {
+
+
+
+            padding: 50px;
+
+
+
+            text-align: center;
+
+
+
+            color: #64748b;
+
+        }
+
+
+
+        .safe {
+
+
+
+            color: #22c55e;
+
+
+
+            font-size: 15px;
+
+
+
+            margin-bottom: 5px;
+
+        }
+
+
+
+        @media (max-width: 800px) {
+
+
+
+            .cards {
+
+
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+
+        }
+
+
+
+        @media (max-width: 700px) {
+
+
+
+            .sidebar {
+
+
+
+                width: 65px;
+
+            }
+
+
+
+            .logo span,
+
+            .nav-title {
+
+
+
+                display: none;
+
+            }
+
+
+
+            .main {
+
+
+
+                margin-left: 65px;
+
+
+
+                padding: 15px;
+
+            }
+
+
+
+        }
+
+        .export-button {
+
+    display: inline-block;
+
+    padding: 10px 16px;
+
+    background: #087f8c;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+    font-weight: 600;
+
+}
+
+
+
+.export-button:hover {
+
+    opacity: 0.9;
+
+}
+
+.workflow-panel {
+
+    margin: 0 15px 20px;
+
+    padding: 16px;
+
+    background: #111827;
+
+    border: 1px solid #334155;
+
+    border-radius: 8px;
+
+}
+
+
+
+.workflow-panel label {
+
+    display: block;
+
+    margin: 12px 0 6px;
+
+    color: #cbd5e1;
+
+    font-size: 13px;
+
+}
+
+
+
+.workflow-panel select,
+
+.workflow-panel textarea {
+
+    width: 100%;
+
+    padding: 10px;
+
+    color: #e5e7eb;
+
+    background: #0b1120;
+
+    border: 1px solid #334155;
+
+    border-radius: 6px;
+
+}
+
+
+
+.workflow-panel textarea {
+
+    min-height: 75px;
+
+    resize: vertical;
+
+}
+
+
+
+.workflow-panel button {
+
+    margin-top: 12px;
+
+    padding: 10px 16px;
+
+    background: #087f8c;
+
+    color: white;
+
+    border: 0;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+}
+
+
+
+.workflow-status {
+
+    color: #38bdf8;
+
+    font-weight: bold;
+
+}
+
+
+
+    </style>
+
+
+
+</head>
+
+
+
+
+
+<body>
+
+
+
+
+
+<!-- SIDEBAR -->
+
+
+
+<aside class="sidebar">
+
+
+
+    <div class="logo">
+
+
+
+        🛡️ <span>SOC Monitor</span>
+
+
+
+    </div>
+
+
+
+
+
+    <div class="nav-title">
+
+
+
+        Monitoring
+
+
+
+    </div>
+
+
+
+
+
+    <div class="nav">
+
+
+
+        <a href="{{ url_for('soc_dashboard') }}">
+
+
+
+            📊 Dashboard
+
+
+
+        </a>
+
+
+
+
+
+        <a href="{{ url_for('logs') }}">
+
+
+
+            📋 Event Logs
+
+
+
+        </a>
+
+
+
+
+
+        <a href="{{ url_for('alerts') }}"
+
+           class="active">
+
+
+
+            🚨 Alerts
+
+
+
+        </a>
+
+
+
+
+
+
+
+        <a href="{{ url_for('search') }}">
+
+
+
+            🔎 Search
+
+
+
+        </a>
+
+
+
+
+
+        <a href="{{ url_for('report') }}">
+
+
+
+            📈 Reports
+
+
+
+        </a>
+
+
+
+
+
+
+
+    </div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<!-- MAIN -->
+
+
+
+<main class="main">
+
+      {% if request.args.get('workflow_saved') == '1' %}
+
+    <div style="color:#86efac; margin-bottom:16px;">
+
+        Investigation status and notes saved successfully.
+
+    </div>
+
+{% endif %}
+
+
+
+    <div class="topbar">
+
+    <div>
+
+        <h1>Security Alerts</h1>
+
+        <div class="subtitle">
+
+            Correlated security incidents and risk-based alerts
+
+        </div>
+
+    </div>
+
+
+
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+
+        <a href="{{ url_for('export_alerts_csv') }}"
+
+           class="export-button">
+
+            Export CSV
+
+        </a>
+
+
+
+        <div class="status">
+
+            <span class="dot"></span>
+
+            Monitoring Active
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+    <!-- SUMMARY -->
+
+
+
+    <section class="cards">
+
+
+
+
+
+        <div class="card">
+
+
+
+            <div class="card-title">
+
+
+
+                Active Alerts
+
+
+
+            </div>
+
+
+
+            <div class="card-value red">
+
+
+
+                {{ alerts|length }}
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+
+
+            <div class="card-title">
+
+
+
+                Overall Risk
+
+
+
+            </div>
+
+
+
+            <div class="card-value orange">
+
+
+
+                {{ overall_score }}
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+
+
+            <div class="card-title">
+
+
+
+                Risk Level
+
+
+
+            </div>
+
+
+
+            <div class="card-value blue">
+
+
+
+                {{ overall_level }}
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+    </section>
+
+
+
+
+
+
+
+    <!-- ALERT LIST -->
+
+
+
+    <div class="panel">
+
+
+
+
+
+        <div class="panel-header">
+
+
+
+            <h2>
+
+                Detected Incidents
+
+            </h2>
+
+
+
+            <div class="count">
+
+
+
+                {{ alerts|length }} alerts
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        {% if alerts %}
+
+
+
+
+
+            {% for alert in alerts %}
+
+
+
+
+
+            <a class="alert alert-link"
+
+              href="{{ url_for('incident_details', incident_id=loop.index0) }}">
+
+
+
+
+
+                <div class="alert-title">
+
+
+
+
+
+                    <div class="alert-name">
+
+
+
+                        {{ alert.name }}
+
+
+
+                    </div>
+
+
+
+
+
+                    <span class="severity
+
+
+
+                        {% if alert.risk_level == 'Critical' %}
+
+
+
+                            critical
+
+
+
+                        {% elif alert.risk_level == 'High' %}
+
+
+
+                            high
+
+
+
+                        {% elif alert.risk_level == 'Medium' %}
+
+
+
+                            medium
+
+
+
+                        {% else %}
+
+
+
+                            low
+
+
+
+                        {% endif %}
+
+
+
+                    ">
+
+
+
+                        {{ alert.risk_level }}
+
+
+
+                    </span>
+
+
+
+
+
+                </div>
+
+
+
+
+
+
+
+                <div class="alert-meta">
+
+
+
+                    Host:
+
+                    {{ alert.hostname }}
+
+
+
+                    &nbsp; | &nbsp;
+
+
+
+                    User:
+
+                    {{ alert.user }}
+
+
+
+                    &nbsp; | &nbsp;
+
+
+
+                    Risk Score:
+
+                    {{ alert.risk_score }}
+
+
+
+                </div>
+
+<div class="description">
+
+    {{ alert.description or "No description available." }}
+
+</div>
+
+
+
+<div style="
+
+    margin-top:12px;
+
+    padding-top:10px;
+
+    border-top:1px solid #263244;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+">
+
+    <strong style="color:#38bdf8;">
+
+        Why this alert was raised
+
+    </strong>
+
+
+
+    {% if alert.risk_reasons %}
+
+        <ul style="padding-left:20px;">
+
+            {% for reason in alert.risk_reasons %}
+
+                <li>{{ reason }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% else %}
+
+        <p>
+
+            {{ alert.description or "The incident met the configured risk threshold." }}
+
+        </p>
+
+    {% endif %}
+
+
+
+    {% if alert.evidence %}
+
+        <strong style="color:#38bdf8;">Evidence</strong>
+
+        <ul style="padding-left:20px;">
+
+            {% for item in alert.evidence %}
+
+                <li>{{ item }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+
+
+    <strong style="color:#38bdf8;">
+
+        Recommended investigation
+
+    </strong>
+
+
+
+    <p>
+
+        {{ alert.recommended_action or "Review the incident, affected host, account, and related events." }}
+
+    </p>
+
+</div>
+
+
+
+
+
+            </a>
+
+
+
+            <!-- INCIDENT INVESTIGATION WORKFLOW -->
+
+            <div class="workflow-panel">
+
+                <div class="workflow-status">
+
+                    Investigation Status:
+
+                    {{ alert.workflow_status }}
+
+                </div>
+
+
+
+                <form method="POST"
+
+                      action="{{ url_for('update_incident_workflow') }}">
+
+
+
+                    <input type="hidden"
+
+                           name="incident_key"
+
+                           value="{{ alert.incident_key }}">
+
+
+
+                    <label for="status-{{ alert.incident_index }}">
+
+                        Update Status
+
+                    </label>
+
+
+
+                    <select id="status-{{ alert.incident_index }}"
+
+                            name="status"
+
+                            required>
+
+                        {% for option in ['New', 'Investigating', 'Resolved', 'False Positive'] %}
+
+                            <option value="{{ option }}"
+
+                                {% if alert.workflow_status == option %}selected{% endif %}>
+
+                                {{ option }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+
+                    <label for="notes-{{ alert.incident_index }}">
+
+                        Analyst Notes
+
+                    </label>
+
+
+
+                    <textarea id="notes-{{ alert.incident_index }}"
+
+                              name="notes"
+
+                              maxlength="5000"
+
+                              placeholder="Record findings and investigation actions...">{{ alert.workflow_notes }}</textarea>
+
+
+
+                    {% if alert.workflow_updated_at %}
+
+                        <p class="alert-meta">
+
+                            Last updated: {{ alert.workflow_updated_at }}
+
+                        </p>
+
+                    {% endif %}
+
+
+
+                    <button type="submit">Save Investigation</button>
+
+                </form>
+
+            </div>
+
+
+
+           {% endfor %}
+
+
+
+        {% else %}
+
+
+
+            <div class="empty">
+
+                <div class="safe">
+
+                    ✓ No Active Security Alerts
+
+                </div>
+
+                The correlation engine has not
+
+                detected any active incidents.
+
+            </div>
+
+
+
+        {% endif %}
+
+
+
+    </div>
+
+
+
+</main>
+
+
+
+
+
+</body>
+
+
+
+</html>
